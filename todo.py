@@ -2,8 +2,10 @@
 # -*- coding: utf-8 -*-
 """
 用法说明：
-  python todo.py list          列出所有任务（未完成显示 [ ]，已完成显示 [x]）
+  python todo.py list          列出所有任务（未完成显示 [ ]，已完成显示 [√]）
   python todo.py add "内容"    添加一个新任务
+  python todo.py done <序号>   将第 N 个任务标记为已完成
+  python todo.py rm <序号>     删除第 N 个任务
 任务保存在同目录下的 todos.json 文件中。
 """
 
@@ -41,7 +43,7 @@ def cmd_list():
         return
     for i, todo in enumerate(todos, start=1):
         # 完成状态：[x] 已完成，[ ] 未完成
-        mark = "[x]" if todo.get("done") else "[ ]"
+        mark = "[√]" if todo.get("done") else "[ ]"
         print(f"{i}. {mark} {todo.get('title', '')}")
 
 
@@ -51,6 +53,39 @@ def cmd_add(title):
     todos.append({"title": title, "done": False})
     save_todos(todos)
     print(f"已添加任务：{title}")
+
+
+def cmd_done(index_str):
+    """将第 N 个任务标记为已完成"""
+    todos = load_todos()
+    try:
+        index = int(index_str)
+    except ValueError:
+        print(f"无效序号：{index_str}（请输入数字）")
+        return
+    # 序号从 1 开始，换算成列表下标需要减 1
+    if index < 1 or index > len(todos):
+        print(f"序号 {index} 不存在，当前共有 {len(todos)} 个任务")
+        return
+    todos[index - 1]["done"] = True
+    save_todos(todos)
+    print(f"已完成：{todos[index - 1]['title']}")
+
+
+def cmd_rm(index_str):
+    """删除第 N 个任务"""
+    todos = load_todos()
+    try:
+        index = int(index_str)
+    except ValueError:
+        print(f"无效序号：{index_str}（请输入数字）")
+        return
+    if index < 1 or index > len(todos):
+        print(f"序号 {index} 不存在，当前共有 {len(todos)} 个任务")
+        return
+    removed = todos.pop(index - 1)
+    save_todos(todos)
+    print(f"已删除：{removed['title']}")
 
 
 def main():
@@ -68,6 +103,16 @@ def main():
             print('用法：python todo.py add "内容"')
             return
         cmd_add(args[1])
+    elif command == "done":
+        if len(args) < 2:
+            print("用法：python todo.py done <序号>")
+            return
+        cmd_done(args[1])
+    elif command == "rm":
+        if len(args) < 2:
+            print("用法：python todo.py rm <序号>")
+            return
+        cmd_rm(args[1])
     else:
         print(f"未知命令：{command}")
         print(__doc__)
