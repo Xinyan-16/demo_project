@@ -6,6 +6,7 @@
   python todo.py add "内容"    添加一个新任务
   python todo.py done <序号>   将第 N 个任务标记为已完成
   python todo.py rm <序号>     删除第 N 个任务
+  python todo.py stats         统计任务数量
 任务保存在同目录下的 todos.json 文件中。
 """
 
@@ -88,6 +89,14 @@ def cmd_rm(index_str):
     print(f"已删除：{removed['title']}")
 
 
+def cmd_stats():
+    """统计任务总数、已完成数和未完成数"""
+    todos = load_todos()
+    total = len(todos)
+    done = sum(1 for t in todos if t.get("done"))
+    print(f"共 {total} 项，已完成 {done} 项，未完成 {total - done} 项")
+
+
 def main():
     # 用 sys.argv 解析参数：第一个是脚本名，后面是子命令和参数
     args = sys.argv[1:]
@@ -113,6 +122,8 @@ def main():
             print("用法：python todo.py rm <序号>")
             return
         cmd_rm(args[1])
+    elif command == "stats":
+        cmd_stats()
     else:
         print(f"未知命令：{command}")
         print(__doc__)
