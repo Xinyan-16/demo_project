@@ -7,6 +7,7 @@
   python todo.py done <序号>   将第 N 个任务标记为已完成
   python todo.py rm <序号>     删除第 N 个任务
   python todo.py stats         统计任务数量
+  python todo.py prio <序号>   将第 N 个任务标记为高优先级
 任务保存在同目录下的 todos.json 文件中。
 """
 
@@ -45,7 +46,9 @@ def cmd_list():
     for i, todo in enumerate(todos, start=1):
         # 完成状态：[x] 已完成，[ ] 未完成
         mark = "[√]" if todo.get("done") else "[ ]"
-        print(f"{i}. {mark} {todo.get('title', '')}")
+        # 高优先级任务在状态标记后显示 !
+        flag = "!" if todo.get("prio") else ""
+        print(f"{i}. {mark}{flag} {todo.get('title', '')}")
 
 
 def cmd_add(title):
@@ -89,6 +92,22 @@ def cmd_rm(index_str):
     print(f"已删除：{removed['title']}")
 
 
+def cmd_prio(index_str):
+    """将第 N 个任务标记为高优先级"""
+    todos = load_todos()
+    try:
+        index = int(index_str)
+    except ValueError:
+        print(f"无效序号：{index_str}（请输入数字）")
+        return
+    if index < 1 or index > len(todos):
+        print(f"序号 {index} 不存在，当前共有 {len(todos)} 个任务")
+        return
+    todos[index - 1]["prio"] = True
+    save_todos(todos)
+    print(f"已标记高优先级：{todos[index - 1]['title']}")
+
+
 def cmd_stats():
     """统计任务总数、已完成数和未完成数"""
     todos = load_todos()
@@ -122,6 +141,11 @@ def main():
             print("用法：python todo.py rm <序号>")
             return
         cmd_rm(args[1])
+    elif command == "prio":
+        if len(args) < 2:
+            print("用法：python todo.py prio <序号>")
+            return
+        cmd_prio(args[1])
     elif command == "stats":
         cmd_stats()
     else:
