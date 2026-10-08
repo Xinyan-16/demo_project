@@ -14,6 +14,10 @@
 import json  # 用于读写 JSON 文件
 import os    # 用于拼接文件路径
 import sys   # 用于解析命令行参数
+# ANSI 颜色代码
+RED = "\033[31m"
+GREEN = "\033[32m"
+RESET = "\033[0m"      # 重置回默认色
 
 # todos.json 与本脚本放在同一目录
 TODO_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "todos.json")
@@ -44,11 +48,20 @@ def cmd_list():
         print("（暂无任务）")
         return
     for i, todo in enumerate(todos, start=1):
-        # 完成状态：[x] 已完成，[ ] 未完成
         mark = "[√]" if todo.get("done") else "[ ]"
-        # 高优先级任务在状态标记后显示 !
-        flag = "!" if todo.get("prio") else ""
-        print(f"{i}. {mark}{flag} {todo.get('title', '')}")
+        title = todo.get("title", "")
+
+        if todo.get("prio"):
+            # 高优先级：红色
+            line = f"{i}. {mark} {RED}{title}{RESET}"
+        elif todo.get("done"):
+            # 已完成：绿色
+            line = f"{i}. {mark} {GREEN}{title}{RESET}"
+        else:
+            # 普通：默认色
+            line = f"{i}. {mark} {title}"
+
+        print(line)
 
 
 def cmd_add(title):
