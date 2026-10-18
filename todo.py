@@ -88,6 +88,13 @@ def cmd_done(index_str):
     save_todos(todos)
     print(f"已完成：{todos[index - 1]['title']}")
 
+    # 完成任务奖励：启动贪吃蛇小游戏（失败不影响主程序）
+    try:
+        from snake_game import run_snake_game
+        run_snake_game()
+    except Exception as e:  # pygame 未安装等情况，只提示，不中断
+        print(f"(奖励游戏未能启动：{e})")
+
 
 def cmd_rm(index_str):
     """删除第 N 个任务"""
