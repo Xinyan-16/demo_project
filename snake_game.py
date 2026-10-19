@@ -93,6 +93,7 @@ def run_snake_game():
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     font = _font(24)
     big_font = _font(48)
+    ui_font = pygame.font.Font(None, 20)  # 计分/长度显示用：默认字体，字号 20
 
     try:
         # -------- 等待界面 --------
@@ -166,7 +167,7 @@ def run_snake_game():
                 else:
                     snake.insert(0, new_head)
                     if new_head == food:
-                        score += 1
+                        score += 10  # 每吃到一个食物加 10 分
                         food = random_food(snake)  # 吃到食物：增长一节（尾巴不移除）
                     else:
                         snake.pop()
@@ -184,6 +185,13 @@ def run_snake_game():
                     screen, GREEN,
                     (x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE - 1, GRID_SIZE - 1),
                 )
+
+            # 界面信息：左上角得分、右上角长度（白色，默认字体 20，位于屏幕两端，避开中央游戏内容）
+            score_surf = ui_font.render(f"得分: {score}", True, WHITE)
+            screen.blit(score_surf, (10, 6))
+            len_surf = ui_font.render(f"长度: {len(snake)}", True, WHITE)
+            len_rect = len_surf.get_rect(topright=(WINDOW_WIDTH - 10, 6))
+            screen.blit(len_surf, len_rect)
 
             if game_over:
                 draw_text(screen, big_font, "Game Over", WHITE,

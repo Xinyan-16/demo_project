@@ -88,6 +88,9 @@ def cmd_done(index_str):
     save_todos(todos)
     print(f"已完成：{todos[index - 1]['title']}")
 
+    # 在唤起游戏前，先在终端打印当前任务清单（输出与 list 命令完全一致）
+    cmd_list()
+
     # 完成任务奖励：启动贪吃蛇小游戏（失败不影响主程序）
     try:
         from snake_game import run_snake_game
